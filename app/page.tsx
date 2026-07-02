@@ -1,65 +1,82 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { experimental_useObject as useObject } from "@ai-sdk/react";
+import { diagnosisSchema } from "@/lib/schema";
+import { type WorkflowId } from "@/lib/workflows";
+import { SAMPLE_WORKFLOWS } from "@/lib/sampleWorkflows";
+import { WorkflowSelector } from "@/components/WorkflowSelector";
+import { DiagnosticInput } from "@/components/DiagnosticInput";
+import { DiagnosisOutput } from "@/components/DiagnosisOutput";
 
 export default function Home() {
+  const [workflowId, setWorkflowId] = useState<WorkflowId>("customer-success");
+  const [context, setContext] = useState("");
+
+  const { object, submit, isLoading, error } = useObject({
+    api: "/api/analyze",
+    schema: diagnosisSchema,
+  });
+
+  const analyze = () => {
+    if (context.trim().length < 20) return;
+    submit({ workflowId, context });
+  };
+
+  const loadSample = () => setContext(SAMPLE_WORKFLOWS[workflowId]);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className="mx-auto w-full max-w-4xl px-6 py-10 md:py-16">
+      <header className="mb-10">
+        <div className="flex flex-wrap items-baseline gap-3">
+          <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
+            WorkflowOS
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+          <span className="text-xs uppercase tracking-widest text-muted-foreground">
+            AI implementation diagnostic
+          </span>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+        <p className="mt-3 max-w-2xl text-muted-foreground">
+          Paste a messy workflow. Get a health score, the real leaks, next-best
+          actions, an automation plan, and an implementation blueprint. Business
+          problem first, workflow second, AI third.
+        </p>
+      </header>
+
+      <section className="space-y-6">
+        <WorkflowSelector
+          value={workflowId}
+          onChange={(v) => {
+            setWorkflowId(v);
+            setContext("");
+          }}
+        />
+        <DiagnosticInput
+          value={context}
+          onChange={setContext}
+          onLoadSample={loadSample}
+          onSubmit={analyze}
+          isLoading={isLoading}
+        />
+      </section>
+
+      {error && (
+        <p className="mt-6 rounded-md border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-600 dark:text-red-400">
+          {error.message}
+        </p>
+      )}
+
+      {object && <DiagnosisOutput diagnosis={object} isStreaming={isLoading} />}
+
+      <footer className="mt-16 border-t pt-6 text-xs text-muted-foreground">
+        <p>
+          Public demo of the WorkflowOS diagnostic layer. The local operator
+          layer (Hermes) is a private companion runtime.
+        </p>
+        <p className="mt-1 italic">
+          Business problem first. Workflow second. AI third.
+        </p>
+      </footer>
+    </main>
   );
 }
