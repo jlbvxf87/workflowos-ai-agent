@@ -94,9 +94,11 @@ docs/
 
 Under `docs/`, one file per target company: how a specific WorkflowOS workflow maps to that company's real operational problem, and how I would implement it in production.
 
-## The optional operator layer
+## The runtime layer (Hermes)
 
-WorkflowOS is the public diagnostic layer. In production, it's designed to pair with a private local-first agent runtime (an operator-style Hermes layer) that handles multi-turn workflow execution, tool-use, contact and pipeline state, and human-in-the-loop task orchestration. The private layer is intentionally out of scope for this public demo — the diagnostic contract is the interesting part.
+WorkflowOS is the public diagnostic layer. A private local-first agent runtime (Hermes) handles multi-turn workflow execution, tool-use, contact and pipeline state, and human-in-the-loop task orchestration on a Mac mini.
+
+The public site includes one scoped bridge to that runtime: the **"Ask WorkflowOS Agent"** panel on the home page hits `/api/ask`, which proxies through a cloudflared tunnel + bearer auth to Hermes's OpenAI-compatible `api_server` platform. Guardrails, guarantees, and architecture in [`docs/hermes-runtime.md`](./docs/hermes-runtime.md).
 
 ## License
 
