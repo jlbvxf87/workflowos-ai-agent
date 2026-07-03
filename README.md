@@ -6,8 +6,8 @@ It was built to demonstrate practical AI implementation thinking across customer
 
 > **Business problem first. Workflow second. AI third.**
 
-**Live demo:** _(add your Vercel URL here after deploy)_
-**Repo:** _(add your GitHub URL here after push)_
+**Live demo:** https://workflowos-ai-agent.vercel.app
+**Repo:** https://github.com/jlbvxf87/workflowos-ai-agent
 
 ## What it demonstrates
 
