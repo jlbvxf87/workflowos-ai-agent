@@ -8,6 +8,7 @@ import { SAMPLE_WORKFLOWS } from "@/lib/sampleWorkflows";
 import { WorkflowSelector } from "@/components/WorkflowSelector";
 import { DiagnosticInput } from "@/components/DiagnosticInput";
 import { DiagnosisOutput } from "@/components/DiagnosisOutput";
+import { AskAgentPanel } from "@/components/AskAgentPanel";
 
 export default function Home() {
   const [workflowId, setWorkflowId] = useState<WorkflowId>("customer-success");
@@ -67,6 +68,8 @@ export default function Home() {
       )}
 
       {object && <DiagnosisOutput diagnosis={object} isStreaming={isLoading} />}
+
+      <AskAgentPanel />
 
       <footer className="mt-16 border-t pt-6 text-xs text-muted-foreground">
         <p>
